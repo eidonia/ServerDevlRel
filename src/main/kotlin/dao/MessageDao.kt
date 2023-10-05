@@ -1,26 +1,32 @@
 package dao
 
 import Database
-import com.mongodb.client.result.InsertOneResult
+import Server
+import com.mongodb.client.model.Filters
+import com.mongodb.client.model.Sorts
+import com.mongodb.kotlin.client.coroutine.FindFlow
+import com.mongodb.kotlin.client.coroutine.MongoCollection
+import kotlinx.coroutines.flow.first
 import model.Message
-import org.litote.kmongo.coroutine.CoroutineCollection
-import org.litote.kmongo.coroutine.CoroutineFindPublisher
-import org.litote.kmongo.eq
 
-class MessageDao(db: Database) {
+class MessageDao(
+    db: Database,
+    private val conversationDao: ConversationDao
+) {
 
-    private val collection: CoroutineCollection<Message> = db.database.getCollection("Message")
+    private val collection: MongoCollection<Message> = db.database.getCollection<Message>("Message")
 
-    suspend fun findById(_id: String): Message? =
-        collection.findOneById(_id)
+    fun findByConversationId(conversationId: String): FindFlow<Message> =
+        collection.find(Filters.eq(Message::conversationId.name, conversationId)).sort(Sorts.descending("${Message::arrivalDate}"))
 
-    fun findByConversationId(conversationId: String): CoroutineFindPublisher<Message> =
-        collection.find(Message::conversationId eq conversationId).descendingSort(Message::arrivalDate)
-
-    fun findAllMessage(): CoroutineFindPublisher<Message> =
+    fun findAllMessage() =
         collection.find()
 
-    suspend fun send(message: Message): InsertOneResult =
+    suspend fun send(message: Message) {
         collection.insertOne(message)
+        val listUser = conversationDao.findById(message.conversationId).first().users.toMutableList()
+        Server.broadcastMessage(message.senderUserId, listUser)
+    }
+
 
 }

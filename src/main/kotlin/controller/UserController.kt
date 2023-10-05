@@ -2,6 +2,7 @@ package controller
 
 import dao.UserDao
 import io.javalin.http.Handler
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import model.User
 

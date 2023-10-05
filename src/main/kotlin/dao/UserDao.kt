@@ -1,21 +1,21 @@
 package dao
 
 import Database
+import com.mongodb.client.model.Filters
+import com.mongodb.kotlin.client.coroutine.FindFlow
+import com.mongodb.kotlin.client.coroutine.MongoCollection
 import model.User
-import org.litote.kmongo.coroutine.CoroutineCollection
-import org.litote.kmongo.coroutine.CoroutineFindPublisher
 
 class UserDao(db: Database) {
 
-    private val collection: CoroutineCollection<User> = db.database.getCollection("User")
+    private val collection: MongoCollection<User> = db.database.getCollection("User")
 
-    suspend fun findById(_id: String): User? =
-        collection.findOneById(_id)
+    suspend fun findById(id: String): FindFlow<User> =
+        collection.find(Filters.eq(User::_id.name, id))
 
-    fun findAllUser(): CoroutineFindPublisher<User> =
+    fun findAllUser() =
         collection.find()
 
-    suspend fun create(user: User) {
-        collection.save(user)
-    }
+    suspend fun create(user: User) =
+        collection.insertOne(user)
 }

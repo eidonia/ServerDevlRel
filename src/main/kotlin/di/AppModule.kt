@@ -2,6 +2,7 @@ package di
 
 import Application
 import Database
+import Server
 import controller.ConversationController
 import controller.MessageController
 import controller.UserController
@@ -14,12 +15,11 @@ import org.koin.dsl.module
 val appModule = module {
 
     single { Database() }
-
     single { Application }
 
     single { ConversationDao(get()) }
     single { UserDao(get()) }
-    single { MessageDao(get()) }
+    single { MessageDao(get(), get()) }
 
     factory { UserController(get()) }
     factory { ConversationController(get(), get(), get()) }

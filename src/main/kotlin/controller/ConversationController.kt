@@ -3,6 +3,8 @@ package controller
 import dao.ConversationDao
 import dao.MessageDao
 import io.javalin.http.Handler
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import mapper.MapperMessage
 import model.Conversation
@@ -40,14 +42,12 @@ class ConversationController(
                 val pageSize = ctx.queryParam("page_size")?.toInt() ?: messages.toList().size
                 println(page)
                 println(pageSize)
-                conv?.let { conversation ->
-                    ctx.json(
-                        ConversationInfo(
-                            conversation = conversation,
-                            messages = messageMapper.toMessages(messages.toList(), page, pageSize),
+                ctx.json(
+                    ConversationInfo(
+                        conversation = conv.first(),
+                        messages = messageMapper.toMessages(messages.toList(), page, pageSize),
                     )
-                    )
-                }
+                )
             }
         }
 }

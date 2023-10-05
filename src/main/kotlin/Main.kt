@@ -1,17 +1,13 @@
+import Server.app
+import Server.broadcastMessage
+import Server.userMap
 import di.DiHelper
-import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.*
 
 fun main() {
     DiHelper.initKoin()
 
-    val app = Javalin.create().apply {
-        exception(Exception::class.java) { e, _ -> e.printStackTrace() }
-        error(404) { ctx -> ctx.json("Not found") }
-    }.start()
-
     app.routes {
-
         get("/") { ctx ->
             ctx.result("hello World")
         }
@@ -23,7 +19,7 @@ fun main() {
             //create conf
             post(Application.conversationController::createConversation.call())
 
-            //get one conversation with id
+            //get one conversation with _id
             path("/{conversationId}") {
                 get(Application.conversationController::getConversationById.call())
 
@@ -48,10 +44,23 @@ fun main() {
             //create user
             post(Application.userController::createUser.call())
 
-            //get one user with id
+            //get one user with _id
             path("/{userId}") {
                 get(Application.userController::getUserById.call())
             }
+        }
+    }
+
+    app.ws("/chat/{userId}") { ws ->
+        ws.onConnect { ctx ->
+            val userId = ctx.pathParam("userId")
+            userMap[ctx] = userId
+        }
+        ws.onClose {ctx ->
+            userMap.remove(ctx)
+        }
+        ws.onMessage {
+            broadcastMessage("C2B3A4D5-E1F0-8A9B-4E8D-2B1A3C4D5E6F",listOf("C2B3A4D5-E1F0-8A9B-4E8D-2B1A3C4D5E6F", "D4E9A2C5-1A7B-4F9C-A8F2-ACE71D9FAC19"))
         }
     }
 }

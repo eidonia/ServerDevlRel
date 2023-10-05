@@ -2,6 +2,7 @@ package controller
 
 import dao.MessageDao
 import io.javalin.http.Handler
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import model.Message
 
@@ -20,6 +21,7 @@ class MessageController(private val messageDao: MessageDao) {
             runBlocking {
                 val message = ctx.bodyAsClass(Message::class.java)
                 messageDao.send(message)
+
             }
         }
 }
