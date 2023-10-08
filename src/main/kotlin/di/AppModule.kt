@@ -22,7 +22,7 @@ val appModule = module {
     single { MessageDao(get(), get()) }
 
     factory { UserController(get()) }
-    factory { ConversationController(get(), get(), get()) }
+    factory { ConversationController(get(), get(), get(), get()) }
     factory { MessageController(get()) }
     factory { MapperMessage() }
 }

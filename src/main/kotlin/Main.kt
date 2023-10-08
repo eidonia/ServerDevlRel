@@ -3,6 +3,7 @@ import Server.broadcastMessage
 import Server.userMap
 import di.DiHelper
 import io.javalin.apibuilder.ApiBuilder.*
+import java.time.Duration
 
 fun main() {
     DiHelper.initKoin()
@@ -53,6 +54,7 @@ fun main() {
 
     app.ws("/chat/{userId}") { ws ->
         ws.onConnect { ctx ->
+            ctx.session.idleTimeout = Duration.ofHours(2)
             val userId = ctx.pathParam("userId")
             userMap[ctx] = userId
         }
@@ -60,7 +62,9 @@ fun main() {
             userMap.remove(ctx)
         }
         ws.onMessage {
-            broadcastMessage("C2B3A4D5-E1F0-8A9B-4E8D-2B1A3C4D5E6F",listOf("C2B3A4D5-E1F0-8A9B-4E8D-2B1A3C4D5E6F", "D4E9A2C5-1A7B-4F9C-A8F2-ACE71D9FAC19"))
+            broadcastMessage(
+                senderId = "C2B3A4D5-E1F0-8A9B-4E8D-2B1A3C4D5E6F",
+                userIds = listOf("C2B3A4D5-E1F0-8A9B-4E8D-2B1A3C4D5E6F", "D4E9A2C5-1A7B-4F9C-A8F2-ACE71D9FAC19"))
         }
     }
 }

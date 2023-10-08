@@ -11,13 +11,17 @@ object Server {
         error(404) { ctx -> ctx.json("Not found") }
     }.start()
 
-    fun broadcastMessage(senderId: String, userIds: List<String>) {
+    fun broadcastMessage(content: String = "", senderId: String, userIds: List<String>) {
         userMap.keys.filter { ws ->
             userIds
                 .filter { it != senderId }
                 .contains(userMap[ws])
         }.forEach { session ->
-            session.send("Plop")
+            session.send(if (content != "") {
+                "Nouveau message reçu"
+            } else {
+                "Plop"
+            })
         }
     }
 }

@@ -10,7 +10,7 @@ class UserDao(db: Database) {
 
     private val collection: MongoCollection<User> = db.database.getCollection("User")
 
-    suspend fun findById(id: String): FindFlow<User> =
+    fun findById(id: String): FindFlow<User> =
         collection.find(Filters.eq(User::_id.name, id))
 
     fun findAllUser() =

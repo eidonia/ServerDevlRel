@@ -1,8 +1,7 @@
-package model
+package model.database
 
-data class Message(
+data class MessageDb(
     val _id: String,
-    val senderName: String,
     val content: String,
     val senderUserId: String,
     val conversationId: String,
